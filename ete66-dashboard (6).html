@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETE66 Dashboard — KMUTT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.462.0/dist/umd/lucide.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          mono: ["'JetBrains Mono'", 'ui-monospace', 'monospace'],
+        },
+        colors: {
+          background: 'var(--background)',
+          foreground: 'var(--foreground)',
+          card: 'var(--card)',
+          'card-foreground': 'var(--card-foreground)',
+          popover: 'var(--popover)',
+          'popover-foreground': 'var(--popover-foreground)',
+          primary: 'var(--primary)',
+          'primary-foreground': 'var(--primary-foreground)',
+          secondary: 'var(--secondary)',
+          'secondary-foreground': 'var(--secondary-foreground)',
+          muted: 'var(--muted)',
+          'muted-foreground': 'var(--muted-foreground)',
+          accent: 'var(--accent)',
+          'accent-foreground': 'var(--accent-foreground)',
+          destructive: 'var(--destructive)',
+          border: 'var(--border)',
+          input: 'var(--input)',
+          ring: 'var(--ring)',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --background: oklch(0.98 0.006 264);
+    --foreground: oklch(0.22 0.03 264);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.22 0.03 264);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.22 0.03 264);
+    --primary: oklch(0.55 0.22 264);
+    --primary-foreground: oklch(0.99 0.01 264);
+    --secondary: oklch(0.95 0.02 280);
+    --secondary-foreground: oklch(0.32 0.08 275);
+    --muted: oklch(0.96 0.01 264);
+    --muted-foreground: oklch(0.53 0.04 264);
+    --accent: oklch(0.58 0.24 300);
+    --accent-foreground: oklch(0.99 0.01 300);
+    --destructive: oklch(0.58 0.23 27);
+    --border: oklch(0.9 0.015 270);
+    --input: oklch(0.9 0.015 270);
+    --ring: oklch(0.55 0.22 264);
+    --chart-1: oklch(0.55 0.22 264);
+    --chart-2: oklch(0.58 0.24 300);
+    --chart-3: oklch(0.6 0.18 200);
+    --chart-4: oklch(0.65 0.2 330);
+    --chart-5: oklch(0.62 0.19 230);
+    --gradient-from: oklch(0.55 0.22 264);
+    --gradient-to: oklch(0.58 0.24 300);
+  }
+  .dark {
+    color-scheme: dark;
+    --background: oklch(0.16 0.02 265);
+    --foreground: oklch(0.96 0.01 264);
+    --card: oklch(0.21 0.03 265);
+    --card-foreground: oklch(0.96 0.01 264);
+    --popover: oklch(0.21 0.03 265);
+    --popover-foreground: oklch(0.96 0.01 264);
+    --primary: oklch(0.68 0.19 264);
+    --primary-foreground: oklch(0.15 0.03 264);
+    --secondary: oklch(0.28 0.05 275);
+    --secondary-foreground: oklch(0.96 0.01 264);
+    --muted: oklch(0.26 0.03 265);
+    --muted-foreground: oklch(0.7 0.03 264);
+    --accent: oklch(0.7 0.2 300);
+    --accent-foreground: oklch(0.15 0.03 300);
+    --destructive: oklch(0.7 0.19 22);
+    --border: oklch(1 0 0 / 12%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.68 0.19 264);
+    --chart-1: oklch(0.68 0.19 264);
+    --chart-2: oklch(0.7 0.2 300);
+    --chart-3: oklch(0.68 0.16 200);
+    --chart-4: oklch(0.72 0.18 330);
+    --chart-5: oklch(0.7 0.17 230);
+    --gradient-from: oklch(0.68 0.19 264);
+    --gradient-to: oklch(0.7 0.2 300);
+  }
+  * { border-color: var(--border); }
+  html, body { background: var(--background); color: var(--foreground); }
+  body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; min-height: 100dvh; }
+  .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+  /* ---- ambient aurora background ---- */
+  .app-aurora { position: relative; }
+  .app-aurora::before, .app-aurora::after {
+    content: ''; position: fixed; z-index: 0; width: 42rem; height: 42rem;
+    border-radius: 9999px; filter: blur(120px); opacity: 0.5; pointer-events: none;
+  }
+  .app-aurora::before { top: -14rem; left: -10rem; background: var(--gradient-from); }
+  .app-aurora::after { bottom: -16rem; right: -12rem; background: var(--gradient-to); }
+  .dark .app-aurora::before, .dark .app-aurora::after { opacity: 0.28; }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: color-mix(in oklch, var(--foreground) 25%, transparent); border-radius: 99px; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .anim-fade-up { animation: fadeUp 0.45s ease both; }
+  @keyframes shimmerX { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
+  .shimmer-sweep { animation: shimmerX 1.4s linear infinite; }
+  @keyframes pingSlow { 75%, 100% { transform: scale(2); opacity: 0; } }
+  .animate-ping-slow { animation: pingSlow 1.6s cubic-bezier(0,0,0.2,1) infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .animate-spin { animation: spin 1s linear infinite; }
+
+  input::placeholder { color: var(--muted-foreground); }
+  input:focus, button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring); }
+</style>
+<style type="text/tailwindcss">
+  @layer components {
+    .glass {
+      background-color: color-mix(in oklch, var(--card) 62%, transparent);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
+    }
+    .glass-strong {
+      background-color: color-mix(in oklch, var(--card) 80%, transparent);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid color-mix(in oklch, var(--border) 90%, transparent);
+    }
+    .text-gradient {
+      background-image: linear-gradient(120deg, var(--gradient-from), var(--gradient-to));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .bg-brand-gradient {
+      background-image: linear-gradient(120deg, var(--gradient-from), var(--gradient-to));
+    }
+  }
+</style>
+</head>
+<body class="app-aurora">
+
+<main class="relative z-10 mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+  <div class="space-y-6">
+
+    <!-- ============ HERO HEADER ============ -->
+    <header class="glass-strong relative overflow-hidden rounded-3xl p-6 sm:p-8 anim-fade-up">
+      <div class="pointer-events-none absolute inset-0 bg-brand-gradient opacity-[0.08]"></div>
+      <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-gradient text-primary-foreground shadow-lg" style="box-shadow:0 12px 24px -8px color-mix(in oklch, var(--primary) 45%, transparent)">
+              <i data-lucide="graduation-cap" class="h-6 w-6"></i>
+            </span>
+            <div>
+              <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
+                <span class="text-gradient">ETE66</span> Dashboard
+              </h1>
+              <p class="text-sm text-muted-foreground"><span id="greetingText">Good morning</span>, welcome back — here's your day.</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="glass flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-medium">
+              <i data-lucide="calendar-days" class="h-4 w-4 text-primary"></i>
+              <span id="liveDate">—</span>
+            </div>
+            <div class="glass flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-medium tabular-nums">
+              <i data-lucide="clock" class="h-4 w-4 text-accent"></i>
+              <span class="font-mono" id="liveTime">--:--:--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Notification button -->
+          <button type="button" id="notifBtn" class="glass flex h-11 items-center gap-2 rounded-2xl px-4 text-sm font-medium transition-colors hover:text-primary disabled:cursor-default disabled:opacity-80">
+            <span id="notifIconWrap"><i data-lucide="bell" class="h-4 w-4"></i></span>
+            <span class="hidden sm:inline" id="notifLabel">Enable notifications</span>
+          </button>
+          <!-- Theme toggle -->
+          <button type="button" id="themeToggle" aria-label="Toggle theme" class="glass relative flex h-11 w-11 items-center justify-center rounded-2xl transition-colors hover:text-primary">
+            <i data-lucide="moon" class="h-5 w-5" id="themeIcon"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ STATS CARDS ============ -->
+    <div id="statsGrid" class="grid grid-cols-2 gap-4 lg:grid-cols-4"></div>
+
+    <!-- ============ CURRENT / NEXT CLASS ============ -->
+    <div class="grid gap-4 md:grid-cols-2">
+      <div id="currentClassCard" class="glass-strong relative overflow-hidden rounded-3xl p-6 anim-fade-up"></div>
+      <div id="nextClassCard" class="glass rounded-3xl p-6 anim-fade-up" style="animation-delay:.08s"></div>
+    </div>
+
+    <!-- ============ SEARCH BAR ============ -->
+    <div class="flex items-center gap-3 anim-fade-up">
+      <div class="glass flex flex-1 items-center gap-2 rounded-2xl px-4">
+        <i data-lucide="search" class="h-4 w-4 shrink-0 text-muted-foreground"></i>
+        <input id="searchInput" type="text" placeholder="Search by subject name or code…" aria-label="Search subjects"
+          class="h-12 w-full bg-transparent text-sm outline-none">
+        <button type="button" id="clearSearch" class="hidden rounded-full p-1 text-muted-foreground transition-colors hover:text-foreground">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+      <button type="button" id="refreshBtn" aria-label="Refresh data" class="glass flex h-12 w-12 items-center justify-center rounded-2xl transition-colors hover:text-primary">
+        <i data-lucide="refresh-cw" class="h-4 w-4" id="refreshIcon"></i>
+      </button>
+    </div>
+    <div class="-mt-3 flex items-center gap-1.5 px-1 text-xs text-muted-foreground" id="dataStatus">
+      <span class="h-1.5 w-1.5 rounded-full" style="background:var(--muted-foreground)"></span>
+      <span>Loading schedule…</span>
+    </div>
+
+    <!-- ============ WEEKLY SCHEDULE ============ -->
+    <section class="glass rounded-3xl p-6 anim-fade-up">
+      <div class="mb-5 flex items-center gap-2">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl" style="background-color:color-mix(in oklch, var(--primary) 15%, transparent); color:var(--primary)">
+          <i data-lucide="calendar-range" class="h-5 w-5"></i>
+        </span>
+        <div>
+          <h2 class="text-lg font-bold">Weekly Schedule</h2>
+          <p class="text-sm text-muted-foreground">Your classes this week</p>
+        </div>
+      </div>
+      <div id="weeklyScheduleGrid"></div>
+    </section>
+
+    <!-- ============ HOMEWORK ============ -->
+    <section class="glass rounded-3xl p-6 anim-fade-up">
+      <div class="mb-5 flex items-center gap-2">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl" style="background-color:color-mix(in oklch, var(--accent) 15%, transparent); color:var(--accent)">
+          <i data-lucide="clipboard-list" class="h-5 w-5"></i>
+        </span>
+        <div>
+          <h2 class="text-lg font-bold">Homework</h2>
+          <p class="text-sm text-muted-foreground" id="homeworkCountLabel">0 assignments to track</p>
+        </div>
+      </div>
+      <div id="homeworkGrid"></div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="glass mt-2 flex flex-col items-center gap-2 rounded-3xl px-6 py-8 text-center anim-fade-up">
+      <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-gradient text-primary-foreground">
+        <i data-lucide="zap" class="h-5 w-5"></i>
+      </span>
+      <p class="text-sm font-semibold">Electrical Engineering Technology</p>
+      <p class="text-sm text-muted-foreground">King Mongkut's University of Technology Thonburi (KMUTT)</p>
+      <p class="mt-1 text-xs text-muted-foreground">ETE66 Dashboard · Auto-refreshes every 30 seconds</p>
+    </footer>
+
+  </div>
+</main>
+
+<script>
+function safeIcons(){
+  try{
+    if(window.lucide && typeof lucide.createIcons === 'function'){
+      lucide.createIcons();
+    }
+  }catch(e){
+    console.warn('lucide icon render skipped:', e);
+  }
+}
+safeIcons();
+
+/* =====================================================================
+   THEME (next-themes equivalent: class strategy, default dark)
+===================================================================== */
+function applyThemeIcon(){
+  const isDark = document.documentElement.classList.contains('dark');
+  document.getElementById('themeIcon').setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+  safeIcons();
+}
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  document.documentElement.classList.toggle('dark');
+  applyThemeIcon();
+});
+applyThemeIcon();
+
+/* =====================================================================
+   SCHEDULE DATA MODEL  (mirrors lib/schedule.ts EnrichedItem shape)
+===================================================================== */
+const WEEK_ORDER = [
+  {index:1, en:'Monday'},
+  {index:2, en:'Tuesday'},
+  {index:3, en:'Wednesday'},
+  {index:4, en:'Thursday'},
+  {index:5, en:'Friday'},
+];
+// Supports both Thai day names (as returned by the live API) and English (used by fallback data)
+const DAY_MAP = {
+  'sunday':{index:0, en:'Sunday'}, 'วันอาทิตย์':{index:0, en:'Sunday'},
+  'monday':{index:1, en:'Monday'}, 'วันจันทร์':{index:1, en:'Monday'},
+  'tuesday':{index:2, en:'Tuesday'}, 'วันอังคาร':{index:2, en:'Tuesday'},
+  'wednesday':{index:3, en:'Wednesday'}, 'วันพุธ':{index:3, en:'Wednesday'},
+  'thursday':{index:4, en:'Thursday'}, 'วันพฤหัสบดี':{index:4, en:'Thursday'}, 'วันพฤหัส':{index:4, en:'Thursday'},
+  'friday':{index:5, en:'Friday'}, 'วันศุกร์':{index:5, en:'Friday'},
+  'saturday':{index:6, en:'Saturday'}, 'วันเสาร์':{index:6, en:'Saturday'},
+};
+const DAY_TINT = {1:'var(--chart-1)', 2:'var(--chart-2)', 3:'var(--chart-3)', 4:'var(--chart-4)', 5:'var(--chart-5)'};
+
+const FALLBACK_SCHEDULE = [
+  {day:'Monday', time:'08:30-11:30', subject:'Power Electronics', code:'PWE301', room:'ETE-301', homework:'', due:''},
+  {day:'Monday', time:'13:00-16:00', subject:'Digital Control Systems', code:'DCS205', room:'ETE-205', homework:'Lab Report 4', due:'2026-07-16'},
+  {day:'Tuesday', time:'09:00-12:00', subject:'Electrical Machines II', code:'EMA212', room:'ETE-Lab 2', homework:'Problem Set 6', due:'2026-07-18'},
+  {day:'Wednesday', time:'08:30-11:30', subject:'Microcontroller Systems', code:'MCU410', room:'ETE-410', homework:'', due:''},
+  {day:'Wednesday', time:'13:00-15:00', subject:'Engineering Ethics', code:'ENG102', room:'ETE-102', homework:'Reflection Essay', due:'2026-07-20'},
+  {day:'Thursday', time:'09:00-12:00', subject:'High Voltage Engineering', code:'HVE301', room:'ETE-Lab 1', homework:'Lab Prep', due:'2026-07-15'},
+  {day:'Thursday', time:'13:00-16:00', subject:'Renewable Energy Systems', code:'RES303', room:'ETE-303', homework:'Design Proposal', due:'2026-07-22'},
+  {day:'Friday', time:'08:30-11:30', subject:'Senior Project Seminar', code:'SPS201', room:'ETE-201', homework:'Progress Report', due:'2026-07-17'},
+];
+
+// "-" (and blank) mean "no value" in the live sheet
+function isEmptyCell(v){
+  if(v == null) return true;
+  const s = String(v).trim();
+  return s === '' || s === '-' || s === '–' || s === '—';
+}
+
+function resolveDay(day){
+  if(!day) return null;
+  const key = String(day).trim().toLowerCase();
+  return DAY_MAP[key] || null;
+}
+
+// Handles "09.30-12.30 น.", "09.30 - 12.30 น.", and plain "08:30-11:30"
+function splitTimeRange(range){
+  if(!range) return [null, null];
+  const cleaned = String(range).replace(/น\.?/g, '').trim();
+  const parts = cleaned.split(/[-–—]/).map(s=>s.trim());
+  return [parts[0] || null, parts[1] || null];
+}
+function timeToMinutes(t){
+  if(!t) return null;
+  // normalize Thai "09.30" dot-separated format to "09:30"
+  const normalized = String(t).trim().replace(/\./g, ':');
+  const [h,m] = normalized.split(':').map(Number);
+  if(Number.isNaN(h) || Number.isNaN(m)) return null;
+  return h*60+m;
+}
+function formatTimeLabel(startMin, endMin){
+  const fmt = (mins)=>{
+    const h = String(Math.floor(mins/60)).padStart(2,'0');
+    const m = String(mins%60).padStart(2,'0');
+    return `${h}:${m}`;
+  };
+  if(startMin==null) return '';
+  return endMin!=null ? `${fmt(startMin)}–${fmt(endMin)}` : fmt(startMin);
+}
+
+// Splits "EPE463 MOTOR CONTROL AND AUTOMATIONSYSTEMS" into code + readable name
+function splitSubject(raw){
+  const s = String(raw||'').trim();
+  const match = s.match(/^([A-Za-z]{2,5}\d{2,4})\s+(.+)$/);
+  if(match){
+    return { code: match[1].toUpperCase(), name: titleCase(match[2]) };
+  }
+  return { code: '', name: titleCase(s) };
+}
+function titleCase(str){
+  return String(str).toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function parseDueDate(due){ if(isEmptyCell(due)) return null; const d = new Date(due+'T23:59:59'); return isNaN(d.getTime()) ? null : d; }
+function isOverdue(due, now){ const d = parseDueDate(due); return d ? d.getTime() < now.getTime() : false; }
+function isDueToday(due, now){ const d = parseDueDate(due); if(!d) return false; return d.toDateString() === now.toDateString(); }
+function formatCountdown(mins){ if(mins==null) return '—'; const h = Math.floor(mins/60), m = mins%60; return h>0 ? `${h}h ${m}m` : `${m}m`; }
+
+let rawSchedule = [];
+let items = [];
+
+function enrichItems(raw){
+  return raw
+    .map((r,i)=>{
+      const dayInfo = resolveDay(r.day);
+      const [startStr, endStr] = splitTimeRange(r.time);
+      const startMin = timeToMinutes(startStr);
+      const endMin = timeToMinutes(endStr);
+      if(!dayInfo || startMin === null) return null;
+
+      const { code: parsedCode, name } = splitSubject(r.subject);
+      const homeworkVal = isEmptyCell(r.homework) ? '' : String(r.homework).trim();
+      const dueVal = isEmptyCell(r.due) ? '' : String(r.due).trim();
+
+      return {
+        id: `item-${i}`,
+        name: name || 'Untitled subject',
+        subject: r.subject || '',
+        code: r.code || parsedCode || '',
+        room: isEmptyCell(r.room) ? '—' : String(r.room).trim(),
+        timeLabel: formatTimeLabel(startMin, endMin) || String(r.time||'').trim(),
+        startMin,
+        endMin: endMin ?? (startMin + 60),
+        dayInfo,
+        hasHomework: !!homeworkVal,
+        homework: homeworkVal,
+        due: dueVal,
+      };
+    })
+    .filter(Boolean);
+}
+
+function getCurrentClass(items, now){
+  const today = now.getDay();
+  const nowMin = now.getHours()*60+now.getMinutes();
+  return items.find(i => i.dayInfo.index===today && nowMin>=i.startMin && nowMin<=i.endMin) || null;
+}
+function getNextClass(items, now){
+  const today = now.getDay();
+  const nowMin = now.getHours()*60+now.getMinutes();
+  const todays = items.filter(i=>i.dayInfo.index===today && i.startMin>nowMin).sort((a,b)=>a.startMin-b.startMin);
+  if(todays.length) return { item: todays[0], dayOffset: 0 };
+  for(let off=1; off<=7; off++){
+    const idx = (today+off)%7;
+    const list = items.filter(i=>i.dayInfo.index===idx).sort((a,b)=>a.startMin-b.startMin);
+    if(list.length) return { item: list[0], dayOffset: off };
+  }
+  return null;
+}
+function minutesUntil(item, dayOffset, now){
+  const nowMin = now.getHours()*60+now.getMinutes();
+  if(dayOffset===0) return item.startMin - nowMin;
+  return (1440 - nowMin) + (dayOffset-1)*1440 + item.startMin;
+}
+
+/* =====================================================================
+   RENDER: STATS CARDS
+===================================================================== */
+function renderStats(now){
+  const today = now ? now.getDay() : null;
+  const totalSubjects = new Set(items.map(i=>i.code || i.name).filter(Boolean)).size;
+  const todaysClasses = items.filter(i=>i.dayInfo.index===today).length;
+  const homeworkCount = items.filter(i=>i.hasHomework).length;
+  const upcomingDeadlines = now ? items.filter(i=>i.hasHomework && i.due && parseDueDate(i.due) && !isOverdue(i.due, now)).length : 0;
+
+  const stats = [
+    {label:'Total Subjects', value:totalSubjects, icon:'book-open', tint:'var(--chart-1)'},
+    {label:"Today's Classes", value:todaysClasses, icon:'calendar-clock', tint:'var(--chart-2)'},
+    {label:'Homework', value:homeworkCount, icon:'clipboard-list', tint:'var(--chart-4)'},
+    {label:'Upcoming Deadlines', value:upcomingDeadlines, icon:'alarm-clock', tint:'var(--chart-5)'},
+  ];
+
+  const grid = document.getElementById('statsGrid');
+  grid.innerHTML = stats.map((s,i)=>`
+    <div class="glass group rounded-3xl p-5 anim-fade-up transition-transform hover:-translate-y-1" style="animation-delay:${i*0.06}s">
+      <div class="flex items-center justify-between">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl" style="background-color:color-mix(in oklch, ${s.tint} 18%, transparent); color:${s.tint}">
+          <i data-lucide="${s.icon}" class="h-5 w-5"></i>
+        </span>
+      </div>
+      <p class="mt-4 text-3xl font-bold tabular-nums tracking-tight">${s.value}</p>
+      <p class="mt-1 text-sm text-muted-foreground">${s.label}</p>
+    </div>`).join('');
+  safeIcons();
+}
+
+/* =====================================================================
+   RENDER: CURRENT / NEXT CLASS
+===================================================================== */
+function renderCurrentNext(now){
+  const current = now ? getCurrentClass(items, now) : null;
+  const next = now ? getNextClass(items, now) : null;
+
+  const curEl = document.getElementById('currentClassCard');
+  curEl.innerHTML = `
+    ${current ? `<div class="pointer-events-none absolute inset-0 bg-brand-gradient" style="opacity:.1"></div>` : ''}
+    <div class="relative">
+      <div class="flex items-center gap-2 text-sm font-medium">
+        <span class="flex items-center gap-1.5" style="color:var(--primary)">
+          <span class="relative flex h-2.5 w-2.5">
+            ${current ? `<span class="absolute inline-flex h-full w-full animate-ping-slow rounded-full" style="background:var(--primary); opacity:.75"></span>` : ''}
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full" style="background:${current ? 'var(--primary)' : 'var(--muted-foreground)'}"></span>
+          </span>
+          <i data-lucide="radio" class="h-4 w-4"></i>
+          Current Class
+        </span>
+      </div>
+      ${current ? `
+        <div class="mt-4 space-y-3">
+          ${current.code ? `<span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold" style="background-color:color-mix(in oklch, var(--primary) 15%, transparent); color:var(--primary)">${current.code}</span>` : ''}
+          <h3 class="text-xl font-bold leading-snug">${current.name}</h3>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+            <span class="font-mono">${current.timeLabel}</span>
+            <span class="flex items-center gap-1"><i data-lucide="map-pin" class="h-3.5 w-3.5"></i>${current.room}</span>
+          </div>
+        </div>` : `
+        <div class="mt-4 flex flex-col items-start gap-2">
+          <span class="flex h-11 w-11 items-center justify-center rounded-2xl" style="background:var(--muted); color:var(--muted-foreground)">
+            <i data-lucide="coffee" class="h-5 w-5"></i>
+          </span>
+          <p class="text-lg font-semibold">No class right now</p>
+          <p class="text-sm text-muted-foreground">Enjoy your break — check your next class on the right.</p>
+        </div>`}
+    </div>`;
+
+  const nextEl = document.getElementById('nextClassCard');
+  nextEl.innerHTML = `
+    <div class="flex items-center gap-2 text-sm font-medium" style="color:var(--accent)">
+      <i data-lucide="calendar-clock" class="h-4 w-4"></i>
+      Next Class
+    </div>
+    ${next ? `
+      <div class="mt-4 space-y-3">
+        <div class="flex items-center gap-2">
+          ${next.item.code ? `<span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold" style="background-color:color-mix(in oklch, var(--accent) 15%, transparent); color:var(--accent)">${next.item.code}</span>` : ''}
+          <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium" style="background:var(--muted); color:var(--muted-foreground)">
+            <i data-lucide="arrow-right" class="h-3 w-3"></i>
+            in ${now ? formatCountdown(minutesUntil(next.item, next.dayOffset, now)) : '—'}
+          </span>
+        </div>
+        <h3 class="text-xl font-bold leading-snug">${next.item.name}</h3>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+          <span class="font-medium text-foreground">${next.item.dayInfo?.en || ''}</span>
+          <span class="font-mono">${next.item.timeLabel}</span>
+          <span class="flex items-center gap-1"><i data-lucide="map-pin" class="h-3.5 w-3.5"></i>${next.item.room}</span>
+        </div>
+      </div>` : `
+      <div class="mt-4">
+        <p class="text-lg font-semibold">No upcoming classes</p>
+        <p class="text-sm text-muted-foreground">You're all caught up for the week.</p>
+      </div>`}`;
+  safeIcons();
+}
+
+/* =====================================================================
+   RENDER: WEEKLY SCHEDULE
+===================================================================== */
+function renderWeeklySchedule(now, filtered, query){
+  const today = now ? now.getDay() : null;
+  const wrap = document.getElementById('weeklyScheduleGrid');
+
+  if(filtered.length===0){
+    wrap.innerHTML = `
+      <div class="flex flex-col items-center gap-2 py-10 text-center">
+        <i data-lucide="search-x" class="h-8 w-8 text-muted-foreground"></i>
+        <p class="font-medium">No matching classes</p>
+        ${query ? `<p class="text-sm text-muted-foreground">Nothing found for "${query}".</p>` : ''}
+      </div>`;
+    safeIcons();
+    return;
+  }
+
+  wrap.innerHTML = `<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+    ${WEEK_ORDER.map(day=>{
+      const tint = DAY_TINT[day.index];
+      const isToday = today===day.index;
+      const dayItems = filtered.filter(i=>i.dayInfo.index===day.index).sort((a,b)=>a.startMin-b.startMin);
+      return `
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between rounded-2xl px-3 py-2" style="background-color:color-mix(in oklch, ${tint} 14%, transparent)">
+            <span class="text-sm font-bold" style="color:${tint}">${day.en}</span>
+            ${isToday ? `<span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style="background:${tint}; color:var(--primary-foreground)">Today</span>` : ''}
+          </div>
+          ${dayItems.length===0 ? `<p class="rounded-2xl border border-dashed px-3 py-4 text-center text-xs text-muted-foreground" style="border-color:var(--border)">No classes</p>` :
+            dayItems.map(item=>`
+              <div class="rounded-2xl border-l-4 p-3 shadow-sm transition-transform hover:-translate-y-0.5" style="border-left-color:${tint}; background-color:color-mix(in oklch, var(--card) 60%, transparent)">
+                ${item.code ? `<p class="text-xs font-semibold" style="color:${tint}">${item.code}</p>` : ''}
+                <p class="mt-0.5 text-sm font-medium leading-snug">${item.name}</p>
+                <p class="mt-1.5 font-mono text-xs text-muted-foreground">${item.timeLabel}</p>
+                <p class="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><i data-lucide="map-pin" class="h-3 w-3"></i>${item.room}</p>
+              </div>`).join('')}
+        </div>`;
+    }).join('')}
+  </div>`;
+  safeIcons();
+}
+
+/* =====================================================================
+   RENDER: HOMEWORK
+===================================================================== */
+function renderHomework(now, filtered, query){
+  const homework = filtered.filter(i=>i.hasHomework);
+  document.getElementById('homeworkCountLabel').textContent = `${homework.length} assignment${homework.length===1?'':'s'} to track`;
+  const grid = document.getElementById('homeworkGrid');
+
+  const formatDue = (due)=>{
+    const d = parseDueDate(due);
+    if(!d) return due;
+    return d.toLocaleDateString('en-US',{month:'short', day:'numeric', year:'numeric'});
+  };
+
+  if(homework.length===0){
+    grid.innerHTML = `
+      <div class="flex flex-col items-center gap-2 py-10 text-center">
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl" style="background-color:color-mix(in oklch, var(--primary) 10%, transparent); color:var(--primary)">
+          <i data-lucide="check-circle-2" class="h-6 w-6"></i>
+        </span>
+        <p class="font-semibold">${query ? 'No matching homework' : 'All caught up!'}</p>
+        <p class="text-sm text-muted-foreground">${query ? `Nothing found for "${query}".` : 'You have no homework assignments right now.'}</p>
+      </div>`;
+    safeIcons();
+    return;
+  }
+
+  grid.innerHTML = `<div class="grid gap-3 sm:grid-cols-2">
+    ${homework.map((item,i)=>{
+      const overdue = now && item.due ? isOverdue(item.due, now) : false;
+      const dueToday = now && item.due ? isDueToday(item.due, now) : false;
+      const cls = overdue ? 'border-[color:var(--destructive)]/40' : dueToday ? 'border-[color:var(--accent)]/40' : 'border-border';
+      const bg = overdue ? 'color-mix(in oklch, var(--destructive) 10%, transparent)' : dueToday ? 'color-mix(in oklch, var(--accent) 10%, transparent)' : 'color-mix(in oklch, var(--card) 60%, transparent)';
+      return `
+        <article class="rounded-2xl border p-4 ${cls} anim-fade-up" style="animation-delay:${i*0.04}s; background-color:${bg}">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              ${item.code ? `<p class="text-xs font-semibold text-muted-foreground">${item.code}</p>` : ''}
+              <p class="text-sm font-semibold leading-snug">${item.name}</p>
+            </div>
+            ${overdue ? `<span class="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style="background:var(--destructive); color:var(--primary-foreground)"><i data-lucide="alert-triangle" class="h-3 w-3"></i>Overdue</span>` :
+              dueToday ? `<span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style="background:var(--accent); color:var(--accent-foreground)">Due today</span>` : ''}
+          </div>
+          <p class="mt-2 text-sm" style="color:color-mix(in oklch, var(--foreground) 90%, transparent)">${item.homework}</p>
+          ${item.due ? `<p class="mt-3 flex items-center gap-1.5 text-xs font-medium" style="color:${overdue?'var(--destructive)':dueToday?'var(--accent)':'var(--muted-foreground)'}"><i data-lucide="calendar-clock" class="h-3.5 w-3.5"></i>Due ${formatDue(item.due)}</p>` : ''}
+        </article>`;
+    }).join('')}
+  </div>`;
+  safeIcons();
+}
+
+/* =====================================================================
+   MASTER RENDER + LIVE CLOCK
+===================================================================== */
+let searchQuery = '';
+function getFiltered(){
+  const q = searchQuery.trim().toLowerCase();
+  if(!q) return items;
+  return items.filter(i=>i.name.toLowerCase().includes(q) || i.code.toLowerCase().includes(q) || i.subject.toLowerCase().includes(q));
+}
+function renderAll(){
+  const now = new Date();
+  renderStats(now);
+  renderCurrentNext(now);
+  const filtered = getFiltered();
+  renderWeeklySchedule(now, filtered, searchQuery);
+  renderHomework(now, filtered, searchQuery);
+}
+
+function tickClock(){
+  const now = new Date();
+  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-US',{weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('liveTime').textContent = now.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false});
+  const h = now.getHours();
+  document.getElementById('greetingText').textContent = h<12 ? 'Good morning' : h<17 ? 'Good afternoon' : 'Good evening';
+}
+tickClock();
+setInterval(tickClock, 1000);
+setInterval(renderAll, 30000);
+
+/* =====================================================================
+   SEARCH BAR
+===================================================================== */
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearSearch');
+searchInput.addEventListener('input', (e)=>{
+  searchQuery = e.target.value;
+  clearBtn.classList.toggle('hidden', !searchQuery);
+  const filtered = getFiltered();
+  renderWeeklySchedule(new Date(), filtered, searchQuery);
+  renderHomework(new Date(), filtered, searchQuery);
+});
+clearBtn.addEventListener('click', ()=>{
+  searchQuery=''; searchInput.value=''; clearBtn.classList.add('hidden');
+  const filtered = getFiltered();
+  renderWeeklySchedule(new Date(), filtered, searchQuery);
+  renderHomework(new Date(), filtered, searchQuery);
+});
+
+/* =====================================================================
+   REFRESH / DATA LOADING (fetch endpoint, graceful fallback)
+===================================================================== */
+const SCHEDULE_API_URL = 'https://script.google.com/macros/s/AKfycbz3_gfLNS_bLnTu4-_5EIBfAVfCZJ8peSG6Qqljy22Agp24tpwg8YuEWhnfeMnBwxsJ/exec';
+
+function setDataStatus(state, extra){
+  const el = document.getElementById('dataStatus');
+  if(!el) return;
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-US',{hour:'2-digit', minute:'2-digit', hour12:false});
+  const cfg = {
+    loading: {dot:'var(--muted-foreground)', text:'Loading schedule…'},
+    live:    {dot:'var(--primary)', text:`Live data from Google Sheets · synced ${timeStr}`},
+    demo:    {dot:'var(--accent)', text:`Showing demo data — live API unreachable from this preview (last tried ${timeStr})`},
+  }[state];
+  el.innerHTML = `<span class="h-1.5 w-1.5 rounded-full" style="background:${cfg.dot}"></span><span>${cfg.text}${extra?' · '+extra:''}</span>`;
+}
+
+/**
+ * Tries the schedule endpoint three ways, in order:
+ *  1. Direct fetch (works if the Apps Script deployment allows cross-origin reads)
+ *  2. Through a public CORS proxy (Apps Script webapps often omit CORS headers)
+ *  3. Falls back to realistic demo data so the dashboard is never empty
+ */
+async function fetchLiveSchedule(){
+  // 1) direct
+  try{
+    const res = await fetch(SCHEDULE_API_URL, {cache:'no-store'});
+    if(res.ok){
+      const json = await res.json();
+      if(Array.isArray(json) && json.length) return json;
+    }
+  }catch(e){ /* fall through */ }
+
+  // 2) CORS proxy fallback
+  try{
+    const proxied = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(SCHEDULE_API_URL);
+    const res = await fetch(proxied, {cache:'no-store'});
+    if(res.ok){
+      const json = await res.json();
+      if(Array.isArray(json) && json.length) return json;
+    }
+  }catch(e){ /* fall through */ }
+
+  return null;
+}
+
+async function loadSchedule(){
+  const icon = document.getElementById('refreshIcon');
+  icon.classList.add('animate-spin');
+  setDataStatus('loading');
+
+  const live = await fetchLiveSchedule();
+  if(live){
+    rawSchedule = live;
+    setDataStatus('live');
+  } else {
+    rawSchedule = FALLBACK_SCHEDULE;
+    setDataStatus('demo');
+  }
+
+  items = enrichItems(rawSchedule);
+  renderAll();
+  icon.classList.remove('animate-spin');
+}
+document.getElementById('refreshBtn').addEventListener('click', loadSchedule);
+
+/* =====================================================================
+   NOTIFICATION BUTTON  (mirrors NotificationButton.tsx states)
+===================================================================== */
+const notifiedSet = new Set();
+function renderNotifButton(){
+  const btn = document.getElementById('notifBtn');
+  const iconWrap = document.getElementById('notifIconWrap');
+  const label = document.getElementById('notifLabel');
+  const supported = typeof Notification !== 'undefined';
+  const perm = supported ? Notification.permission : 'unsupported';
+  const map = {
+    default: {icon:'bell', text:'Enable notifications', color:''},
+    granted: {icon:'bell-ring', text:'Notifications on', color:'var(--primary)'},
+    denied: {icon:'bell-off', text:'Notifications blocked', color:''},
+    unsupported: {icon:'bell-off', text:'Not supported', color:''},
+  };
+  const cfg = map[perm] || map.unsupported;
+  iconWrap.innerHTML = `<i data-lucide="${cfg.icon}" class="h-4 w-4"></i>`;
+  iconWrap.style.color = cfg.color;
+  label.textContent = cfg.text;
+  btn.disabled = perm !== 'default';
+  safeIcons();
+}
+document.getElementById('notifBtn').addEventListener('click', async ()=>{
+  if(typeof Notification === 'undefined' || Notification.permission !== 'default') return;
+  const result = await Notification.requestPermission();
+  renderNotifButton();
+  if(result === 'granted'){
+    new Notification('ETE66 Dashboard', {body:"Notifications enabled. We'll remind you when homework is due today."});
+  }
+});
+renderNotifButton();
+
+function checkHomeworkNotifications(){
+  if(typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const now = new Date();
+  for(const item of items){
+    if(item.hasHomework && item.due && isDueToday(item.due, now) && !notifiedSet.has(item.id)){
+      notifiedSet.add(item.id);
+      new Notification('Homework due today', {body:`${item.name}: ${item.homework}`});
+    }
+  }
+}
+setInterval(checkHomeworkNotifications, 60000);
+
+/* =====================================================================
+   INIT
+===================================================================== */
+loadSchedule();
+</script>
+</body>
+</html>
